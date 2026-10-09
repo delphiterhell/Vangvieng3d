@@ -920,9 +920,7 @@ html {
 @media (max-width: 900px) {
   .nav { display: none; }
   .menu-toggle { display: inline-flex; }
-  /* Nell'header mobile restano solo logo e menu: "Salta il volo" è nella hero */
-  .site-header .skip-flight,
-  .site-header.is-flying .skip-flight { display: none; }
+  .skip-flight { margin-left: auto; margin-right: 22px; }
 
   .skies__content { padding-block: calc(var(--header-h) + 3vh) 5vh; }
   .skies__foot { flex-direction: column; align-items: flex-start; gap: 26px; }

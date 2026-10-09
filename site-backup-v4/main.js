@@ -1,9 +1,6 @@
 import { createFlight } from "./scene.js";
 
 gsap.registerPlugin(ScrollTrigger);
-// Su smartphone le barre del browser compaiono e si ritirano scorrendo: non è un
-// vero ridimensionamento e la regia non va ricalcolata ogni volta
-ScrollTrigger.config({ ignoreMobileResize: true });
 
 /* ---------- Regia dello scroll ---------- */
 
@@ -106,16 +103,12 @@ function startJourney(flight) {
 
   const figure = opening.querySelector(".opening__figure");
   const frame = opening.querySelector(".opening__frame");
-  // Posizione e misure della cornice dentro il palco: dove va a fermarsi la fotografia
-  function measureFrame() {
+  // Distanza della cornice dai bordi del palco: dove va a fermarsi la fotografia
+  const inset = (side) => () => {
     const s = stage.getBoundingClientRect();
     const f = frame.getBoundingClientRect();
-    figure.style.setProperty("--frame-t", `${f.top - s.top}px`);
-    figure.style.setProperty("--frame-l", `${f.left - s.left}px`);
-    figure.style.setProperty("--frame-w", `${f.width}px`);
-    figure.style.setProperty("--frame-h", `${f.height}px`);
-  }
-  measureFrame();
+    return { t: f.top - s.top, r: s.right - f.right, b: s.bottom - f.bottom, l: f.left - s.left }[side] + "px";
+  };
 
   // Posizione del bordo della fotografia a un certo punto del volo, in frazioni
   // dello schermo: sotto 0 la fotografia non si vede, a "covered" lo copre tutto.
@@ -143,8 +136,6 @@ function startJourney(flight) {
     figure.style.visibility = wake > 0 ? "visible" : "hidden";
     figure.style.setProperty("--wake", wake.toFixed(4));
     figure.classList.toggle("is-covering", wake >= covered);
-    // a volo concluso il testo di "Come inizia" torna a ricevere i tocchi
-    journey.classList.toggle("is-landed", timeline.time() >= L);
   }
   figure.style.setProperty("--feather", WAKE.feather);
 
@@ -183,7 +174,10 @@ function startJourney(flight) {
     // DALLA FOTOGRAFIA ALLA PAGINA — a tutto schermo per un respiro, poi la fotografia
     // si ridimensiona fino alla cornice e la carta appare attorno
     .fromTo(".opening__paper", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.001 }, cut(0))
-    .fromTo(figure, { "--fit": 0 }, { "--fit": 1, duration: span(CUT.resize), ease: "power2.inOut" }, cut(CUT.resize[0]))
+    .fromTo(figure, { "--box-t": "0px", "--box-r": "0px", "--box-b": "0px", "--box-l": "0px" }, {
+      "--box-t": inset("t"), "--box-r": inset("r"), "--box-b": inset("b"), "--box-l": inset("l"),
+      duration: span(CUT.resize), ease: "power2.inOut"
+    }, cut(CUT.resize[0]))
     .fromTo(figure, { "--photo-x": () => style("--photo-x-wide") }, {
       "--photo-x": () => style("--photo-x-framed"), duration: span(CUT.resize), ease: "power2.inOut"
     }, cut(CUT.resize[0]))
@@ -216,13 +210,10 @@ function startJourney(flight) {
     if (timeline.time() < L && stage.getBoundingClientRect().bottom > 0) flight.render();
   });
 
-  // Il palco cambia misura quando si ruota il telefono o quando le barre del browser
-  // si ritirano: la scena e la cornice lo seguono subito, senza aspettare altro
-  new ResizeObserver(() => {
+  window.addEventListener("resize", () => {
     flight.resize();
-    measureFrame();
     updateWake();
-  }).observe(stage);
+  });
   updateWake();
   updateHeader();
 }

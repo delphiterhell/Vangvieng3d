@@ -217,20 +217,15 @@ a { color: inherit; text-decoration: none; }
 
 /* Con la scena attiva il palco resta fermo e lo scroll diventa la regia */
 .journey.is-3d {
-  /* lvh: l'altezza massima del viewport, così la durata dello scroll non cambia
-     quando le barre del browser mobile compaiono o si ritirano */
   height: calc(var(--flight-length) + var(--cut-length) + 100vh);
-  height: calc(var(--flight-length) + var(--cut-length) + 100lvh);
+  height: calc(var(--flight-length) + var(--cut-length) + 100svh);
 }
 
 .journey.is-3d .stage {
   position: sticky;
   top: 0;
-  /* dvh: tutta l'area visibile in ogni momento. Con svh, su smartphone, quando la
-     barra degli indirizzi si ritira il palco restava più corto dello schermo e
-     sotto compariva lo sfondo scuro della pagina */
   height: 100vh;
-  height: 100dvh;
+  height: 100svh;
   overflow: hidden;
   background: var(--ink);
 }
@@ -367,12 +362,6 @@ a { color: inherit; text-decoration: none; }
 @keyframes title-in {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: none; }
-}
-
-/* "Salta il volo" in basso sul panorama: solo su schermi stretti, dove
-   nell'header non c'è posto (vedi le regole per schermi stretti più sotto) */
-.hero__skip {
-  display: none;
 }
 
 /* ---------- Caricamento e invito a scorrere ---------- */
@@ -515,7 +504,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Con la scena attiva la sezione è l'ultima inquadratura del palco: la fotografia
    entra nella scia della mongolfiera (--wake), riempie il palco e poi si ridimensiona
-   fino a .opening__frame (--fit va da 0 a 1). Questi valori li anima main.js */
+   fino a .opening__frame (--box-*). Tutti questi valori li anima main.js */
 .journey.is-3d .opening {
   position: absolute;
   inset: 0;
@@ -545,23 +534,17 @@ a { color: inherit; text-decoration: none; }
 }
 
 .journey.is-3d .opening__figure {
-  /* --fit: 0 = a tutto schermo, 1 = dentro la cornice. Posizione e misure della
-     cornice (--frame-*) le scrive main.js e le aggiorna a ogni ridimensionamento */
-  --fit: 0;
-  --frame-t: 0px;
-  --frame-l: 0px;
-  --frame-w: 100%;
-  --frame-h: 100%;
+  /* distanza dai bordi del palco: 0 = a tutto schermo */
+  --box-t: 0px;
+  --box-r: 0px;
+  --box-b: 0px;
+  --box-l: 0px;
   /* bordo sfumato della scia, in frazioni della larghezza: la fotografia è piena
      a sinistra di (--wake - --feather) e trasparente a destra di --wake */
   --wake: 0;
   --feather: .3;
   --photo-x: var(--photo-x-wide);
-  inset: auto;
-  top: calc(var(--fit) * var(--frame-t));
-  left: calc(var(--fit) * var(--frame-l));
-  width: calc(100% + var(--fit) * (var(--frame-w) - 100%));
-  height: calc(100% + var(--fit) * (var(--frame-h) - 100%));
+  inset: var(--box-t) var(--box-r) var(--box-b) var(--box-l);
   -webkit-mask-image: linear-gradient(90deg, #000 calc((var(--wake) - var(--feather)) * 100%), transparent calc(var(--wake) * 100%));
   mask-image: linear-gradient(90deg, #000 calc((var(--wake) - var(--feather)) * 100%), transparent calc(var(--wake) * 100%));
   visibility: hidden;
@@ -580,11 +563,6 @@ a { color: inherit; text-decoration: none; }
 
 .journey.is-3d .opening__text {
   position: relative;
-}
-
-/* Solo a volo concluso il testo riceve tocchi e selezione: prima è invisibile
-   e non deve coprire ciò che sta in basso nella hero */
-.journey.is-3d.is-landed .opening__text {
   pointer-events: auto;
 }
 
@@ -607,30 +585,6 @@ a { color: inherit; text-decoration: none; }
   .hero__coords br { display: none; }
   .scroll-hint { display: none !important; }
   .loader { bottom: 24px; }
-
-  /* Allineato alle coordinate, sul lato opposto: resta durante tutto il flyby */
-  .journey.is-3d .hero__skip {
-    position: absolute;
-    right: calc(var(--gutter) - 10px);
-    bottom: 38px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 10px;
-    font-size: 10.5px;
-    font-weight: 500;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--cream);
-    text-shadow: 0 1px 14px rgba(24, 21, 18, .7);
-  }
-
-  .journey.is-3d .hero__skip::after {
-    content: "";
-    width: 18px;
-    height: 1px;
-    background: currentColor;
-  }
 
   .opening__grid { grid-template-columns: 1fr; row-gap: var(--space-m); }
   .opening__frame,

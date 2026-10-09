@@ -1,0 +1,657 @@
+/* Vang Vieng Adventures — homepage immersiva
+   Palette, caratteri, motivo tessile e grana vengono dal sito originale. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Palette */
+  --cream:        #F1E7D2;   /* carta di riso */
+  --lacquer:      #8F2F24;   /* rosso lacca — solo accento */
+  --saffron:      #D7A63A;   /* zafferano — solo accento */
+  --jade:         #2F5144;
+  --ink:          #24211D;   /* quasi nero caldo */
+
+  --ink-15: rgba(36, 33, 29, .15);
+  --cream-80: rgba(241, 231, 210, .8);
+
+  /* Caratteri */
+  --serif: "Instrument Serif", "Times New Roman", Georgia, serif;
+  --sans:  "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Cocomat Pro", "Manrope", system-ui, sans-serif;
+  --title: "Montserrat Alternates", "Manrope", system-ui, sans-serif;
+
+  --fs-body: clamp(15px, 1.05vw, 17px);
+
+  /* Spazi */
+  --gutter:   clamp(20px, 5vw, 76px);
+  --space-s:  clamp(16px, 2vw, 28px);
+  --space-m:  clamp(32px, 4vw, 64px);
+  --space-xl: clamp(96px, 12vw, 190px);
+  --maxw:     1480px;
+  --header-h: 84px;
+
+  /* Tutto lento e morbido, niente di elastico */
+  --ease-out:  cubic-bezier(.16, 1, .3, 1);
+  --ease-slow: cubic-bezier(.22, .61, .36, 1);
+  --ease-inout: cubic-bezier(.65, 0, .35, 1);
+
+  /* ---------- Regia dello scroll ---------- */
+  /* Quanto scroll dura il flyby e quanto la transizione verso "Come inizia".
+     main.js legge questi due valori: basta cambiarli qui. */
+  --flight-length: 400vh;
+  --cut-length: 170vh;
+
+  /* Fotografia del panorama: proporzioni e punto che resta inquadrato (0–1).
+     Letti anche da scene.js per inquadrare la scena 3D allo stesso modo */
+  --world-ratio: 2752 / 1536;
+  --focus-x: 0.5;
+  --focus-y: 0.45;
+
+  /* Mongolfiera del fallback statico, in % della fotografia */
+  --balloon-x: 61%;
+  --balloon-y: 43%;
+  --balloon-h: 12%;
+
+  /* Bordo ispirato ai tessuti lao: piccole losanghe con un punto, unite da un filo */
+  --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'%3E%3Cpath d='M6 1 L11 5 L6 9 L1 5 Z' fill='none' stroke='%238F2F24' stroke-width='.8'/%3E%3Ccircle cx='6' cy='5' r='1' fill='%238F2F24'/%3E%3Cpath d='M11 5 H24' stroke='%238F2F24' stroke-width='.5'/%3E%3C/svg%3E");
+  /* Grana della carta */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .14 0 0 0 0 .13 0 0 0 0 .11 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* La grana sta sopra a tutto, scena 3D compresa: tiene insieme pellicola e carta */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  background-image: var(--grain);
+  opacity: .13;
+  mix-blend-mode: multiply;
+}
+
+img, svg { display: block; max-width: 100%; }
+h1, h2, p, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--saffron); color: var(--ink); }
+
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 300;
+  padding: 10px 14px;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 13px;
+  transform: translateY(-200%);
+}
+
+.skip:focus { transform: none; }
+
+.motif {
+  display: block;
+  height: 10px;
+  width: 100%;
+  background-image: var(--motif);
+  background-size: 24px 10px;
+  background-position: left center;
+  background-repeat: round no-repeat;
+  opacity: .75;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  padding-inline: var(--gutter);
+  color: var(--cream);
+  transition: color .8s var(--ease-slow);
+}
+
+/* Sopra la carta: inchiostro al posto del crema */
+.site-header.is-paper {
+  color: var(--ink);
+}
+
+.site-header.is-solid {
+  background-color: rgba(241, 231, 210, .94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--display);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.logo__mark {
+  flex: none;
+  width: 17px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.logo__mark .logo__basket { fill: var(--saffron); stroke: none; }
+.logo__text { display: grid; }
+.logo__text > span:last-child { font-weight: 400; opacity: .8; }
+
+.nav__list {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(18px, 2.2vw, 34px);
+}
+
+.nav__list a {
+  font-size: 13px;
+  letter-spacing: .01em;
+  padding-block: 6px;
+  opacity: .82;
+  transition: opacity .5s var(--ease-slow), color .8s var(--ease-slow);
+}
+
+.nav__list a:hover,
+.nav__list a:focus-visible { opacity: 1; }
+
+.nav__list .nav__book { color: var(--saffron); opacity: 1; }
+.is-paper .nav__list .nav__book { color: var(--lacquer); }
+
+/* ---------- Viaggio: palco condiviso ---------- */
+
+.stage {
+  position: relative;
+}
+
+/* Con la scena attiva il palco resta fermo e lo scroll diventa la regia */
+.journey.is-3d {
+  height: calc(var(--flight-length) + var(--cut-length) + 100vh);
+  height: calc(var(--flight-length) + var(--cut-length) + 100svh);
+}
+
+.journey.is-3d .stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  color: var(--cream);
+  background: var(--ink);
+}
+
+.journey.is-3d .hero {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  min-height: 0;
+}
+
+/* Fallback: la fotografia copre sempre lo schermo mantenendo le proporzioni */
+.world {
+  --world-w: max(100vw, 100vh * var(--world-ratio));
+  --world-w: max(100vw, 100svh * var(--world-ratio));
+  position: absolute;
+  width: var(--world-w);
+  aspect-ratio: var(--world-ratio);
+  left: calc((100% - var(--world-w)) * var(--focus-x));
+  top: calc((100% - var(--world-w) / (var(--world-ratio))) * var(--focus-y));
+}
+
+.world__photo {
+  width: 100%;
+  height: 100%;
+}
+
+.world__balloon {
+  position: absolute;
+  left: var(--balloon-x);
+  top: var(--balloon-y);
+  height: var(--balloon-h);
+  width: auto;
+  max-width: none;
+  translate: -50% -50%;
+  /* velatura atmosferica: la mongolfiera è lontana */
+  filter: saturate(0.86) contrast(0.9) brightness(1.03);
+}
+
+/* Il canvas è opaco: quando compare copre il fallback */
+.gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+.journey.is-3d .gl {
+  opacity: 1;
+}
+
+/* Ombra morbida dietro al titolo: sfuma insieme a lui quando parte il flyby */
+.hero__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 45% at 18% 28%, rgba(24, 21, 18, .42) 0%, rgba(24, 21, 18, 0) 100%),
+    linear-gradient(180deg, rgba(24, 21, 18, .5) 0%, rgba(24, 21, 18, .12) 30%, rgba(24, 21, 18, 0) 50%),
+    linear-gradient(0deg, rgba(24, 21, 18, .55) 0%, rgba(24, 21, 18, 0) 34%);
+}
+
+.hero__content {
+  position: absolute;
+  top: clamp(100px, 14vh, 170px);
+  bottom: clamp(28px, 6vh, 64px);
+  left: var(--gutter);
+  right: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.hero__title {
+  --hero-size: clamp(2rem, 3.8vw, 4.3rem);
+  font-family: var(--title);
+  font-weight: 400;
+  font-size: var(--hero-size);
+  line-height: 1.04;
+  letter-spacing: -.03em;
+  color: var(--cream);
+}
+
+.hero__line {
+  display: block;
+  animation: title-in 1.8s var(--ease-out) .25s both;
+}
+
+.hero__line--second {
+  padding-left: .9em;
+  font-size: 1.1em;
+  color: var(--saffron);
+  animation-delay: .42s;
+}
+
+.hero__sub {
+  max-width: 27ch;
+  margin-top: auto;
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--cream-80);
+  animation: title-in 1.8s var(--ease-out) .8s both;
+}
+
+.hero__coords {
+  position: absolute;
+  right: var(--gutter);
+  bottom: clamp(28px, 6vh, 64px);
+  text-align: right;
+  font-size: 10px;
+  letter-spacing: .06em;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+  color: rgba(241, 231, 210, .55);
+}
+
+@keyframes title-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Caricamento e invito a scorrere ---------- */
+
+.loader {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(28px, 6vh, 64px);
+  translate: -50% 0;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(241, 231, 210, .7);
+  transition: opacity .6s ease;
+}
+
+.journey.is-3d .loader {
+  opacity: 0;
+}
+
+.scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  padding-bottom: 28px;
+  translate: -50% 0;
+  display: none;
+}
+
+/* C'è qualcosa da scorrere solo con la scena attiva */
+.journey.is-3d .scroll-hint {
+  display: block;
+}
+
+.scroll-hint i {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 56px;
+  overflow: hidden;
+  background: rgba(241, 231, 210, .16);
+}
+
+.scroll-hint i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--cream-80);
+  animation: scroll-line 3.6s var(--ease-inout) infinite;
+}
+
+@keyframes scroll-line {
+  0%   { transform: translateY(-100%); }
+  60%  { transform: translateY(0); }
+  100% { transform: translateY(100%); }
+}
+
+/* ---------- Come inizia ---------- */
+
+/* Senza scena 3D: una normale sezione su carta, fotografia a sinistra e testo a destra */
+.opening {
+  position: relative;
+  padding-block: var(--space-xl);
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.opening__paper {
+  display: none;
+}
+
+.opening__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 24px;
+  align-items: center;
+}
+
+.opening__frame {
+  position: relative;
+  grid-column: 1 / 6;
+  aspect-ratio: 4 / 5.3;
+  background: var(--jade);
+}
+
+.opening__figure {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.opening__figure img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  /* fotografia orizzontale in cornice verticale: tiene la mongolfiera al centro */
+  object-position: 0% 50%;
+}
+
+.opening__text {
+  grid-column: 7 / 13;
+}
+
+.opening__text .motif {
+  margin-bottom: var(--space-m);
+}
+
+.opening__title {
+  overflow: hidden;
+  font-family: var(--title);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 5.8vw, 6.2rem);
+  line-height: 1.08;
+  letter-spacing: -.03em;
+}
+
+.opening__title span {
+  display: block;
+}
+
+.opening__lead {
+  margin-top: var(--space-s);
+  max-width: 19ch;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.6rem, 2.7vw, 2.5rem);
+  line-height: 1.12;
+  color: var(--lacquer);
+}
+
+.opening__body {
+  display: grid;
+  gap: 1em;
+  max-width: 46ch;
+  margin-top: var(--space-s);
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.6;
+}
+
+/* Con la scena attiva la sezione è l'ultima inquadratura del palco:
+   la fotografia lo riempie e poi si restringe (clip-path) fino a .opening__frame.
+   I quattro valori --clip-* li anima main.js */
+.journey.is-3d .opening {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  background: none;
+  pointer-events: none;
+}
+
+.journey.is-3d .opening__paper {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: var(--cream);
+  visibility: hidden;
+}
+
+.journey.is-3d .opening__grid {
+  height: 100%;
+  padding-top: calc(var(--header-h) * .6);
+}
+
+.journey.is-3d .opening__frame {
+  position: static;
+  max-height: 72vh;
+  max-height: 72svh;
+  background: none;
+}
+
+.journey.is-3d .opening__figure {
+  --clip-t: 0px;
+  --clip-r: 0px;
+  --clip-b: 0px;
+  --clip-l: 0px;
+  clip-path: inset(var(--clip-t) var(--clip-r) var(--clip-b) var(--clip-l));
+  visibility: hidden;
+}
+
+.journey.is-3d .opening__figure img {
+  /* su schermi meno larghi della foto tiene la mongolfiera dentro la cornice */
+  object-position: 30% 50%;
+}
+
+.journey.is-3d .opening__text {
+  position: relative;
+  pointer-events: auto;
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  position: relative;
+  padding-block: var(--space-m);
+  background: var(--ink);
+  color: var(--cream-80);
+  font-size: 13px;
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 32px;
+}
+
+.footer__brand {
+  font-family: var(--display);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: 11.5px;
+  color: var(--cream);
+}
+
+.footer__brand span {
+  margin-left: 14px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--saffron);
+}
+
+.footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+}
+
+.footer__meta a:hover,
+.footer__meta a:focus-visible { color: var(--saffron); }
+
+/* ---------- Schermi stretti ---------- */
+
+@media (max-width: 900px) {
+  :root {
+    --header-h: 68px;
+    /* su mobile il volo dura meno scroll */
+    --flight-length: 320vh;
+    --cut-length: 150vh;
+  }
+
+  .hero__content { top: clamp(104px, 17svh, 150px); bottom: 96px; }
+  .hero__title { --hero-size: clamp(1.8rem, 8vw, 3rem); }
+  .hero__line--second { padding-left: .6em; }
+  .hero__coords { left: var(--gutter); right: auto; text-align: left; bottom: 52px; }
+  .hero__coords br { display: none; }
+  .scroll-hint { display: none !important; }
+  .loader { bottom: 24px; }
+
+  .opening__grid { grid-template-columns: 1fr; row-gap: var(--space-m); }
+  .opening__frame,
+  .opening__text { grid-column: 1; }
+  .opening__frame { aspect-ratio: 4 / 4.2; }
+  .opening__figure img { object-position: 12% 50%; }
+  .opening__text .motif { margin-bottom: var(--space-s); }
+  .opening__title { font-size: clamp(2.3rem, 11vw, 3.4rem); }
+  .opening__lead { margin-top: 10px; font-size: 1.5rem; }
+  .opening__body { margin-top: 14px; font-size: 15px; line-height: 1.55; }
+
+  /* Palco: fotografia in alto, testo sotto, tutto in una schermata */
+  .journey.is-3d .opening__grid {
+    align-content: start;
+    row-gap: 22px;
+    padding-top: var(--header-h);
+  }
+
+  .journey.is-3d .opening__frame {
+    aspect-ratio: auto;
+    height: 38vh;
+    height: 38svh;
+    max-height: none;
+  }
+
+  .journey.is-3d .opening__figure img { object-position: 12% 50%; }
+}
+
+@media (max-aspect-ratio: 4 / 5) {
+  :root {
+    --focus-x: 0.47;
+    --balloon-x: 54%;
+    --balloon-h: 10%;
+  }
+}
+
+/* ---------- Movimento ridotto ---------- */
+
+/* La scena 3D non parte (vedi main.js): resta la pagina statica, senza animazioni d'ingresso */
+@media (prefers-reduced-motion: reduce) {
+  .hero__line,
+  .hero__sub { animation: none; }
+  .scroll-hint i::after { animation: none; }
+}
+
+.opening__title:focus { outline: none; }

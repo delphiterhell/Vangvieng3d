@@ -1,0 +1,176 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Proporzioni della fotografia originale */
+  --world-ratio: 2752 / 1536;
+
+  /* Composizione del fallback statico: mongolfiera in % della fotografia */
+  --balloon-x: 61%;
+  --balloon-y: 43%;
+  --balloon-h: 12%;
+
+  /* Quale punto della fotografia resta inquadrato quando lo schermo la ritaglia (0–1) */
+  --focus-x: 0.5;
+  --focus-y: 0.45;
+}
+
+html,
+body {
+  margin: 0;
+  background: #0d1420;
+}
+
+/* Senza scena 3D la pagina è una composizione statica a tutto schermo.
+   Con la scena attiva, l'altezza della sezione = quanto scroll serve per completare il volo */
+.flight.is-3d {
+  height: 800vh;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: #0d1420;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ---------- Fallback statico ---------- */
+
+/* Copre sempre lo schermo mantenendo le proporzioni della fotografia */
+.world {
+  --world-w: max(100vw, 100vh * var(--world-ratio));
+  --world-w: max(100vw, 100svh * var(--world-ratio));
+  position: absolute;
+  width: var(--world-w);
+  aspect-ratio: var(--world-ratio);
+  left: calc((100% - var(--world-w)) * var(--focus-x));
+  top: calc((100% - var(--world-w) / (var(--world-ratio))) * var(--focus-y));
+}
+
+.fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.balloon-path {
+  position: absolute;
+  left: var(--balloon-x);
+  top: var(--balloon-y);
+  height: var(--balloon-h);
+  aspect-ratio: 1536 / 2592;
+  translate: -50% -50%;
+}
+
+.balloon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* velatura atmosferica: la mongolfiera è lontana */
+  filter: saturate(0.86) contrast(0.9) brightness(1.03);
+}
+
+/* ---------- Scena 3D ---------- */
+
+/* Il canvas è opaco: quando compare copre il fallback */
+.gl {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.flight.is-3d .gl,
+.flight.is-3d-static .gl {
+  opacity: 1;
+}
+
+/* ---------- Atmosfera ---------- */
+
+.vignette {
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(8, 12, 22, 0.42) 100%),
+    linear-gradient(to bottom, rgba(8, 12, 22, 0.10), transparent 22%, transparent 78%, rgba(8, 12, 22, 0.28));
+}
+
+/* ---------- Caricamento, scroll, errori ---------- */
+
+.loader {
+  position: absolute;
+  left: 50%;
+  bottom: 5vh;
+  translate: -50% 0;
+  color: rgba(255, 255, 255, 0.82);
+  font: 0.75rem/1 system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: opacity 0.6s ease;
+}
+
+.flight.is-3d .loader,
+.flight.is-3d-static .loader,
+.flight.is-failed .loader {
+  opacity: 0;
+}
+
+.scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 4vh;
+  width: 1px;
+  height: 7vh;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.scroll-hint span {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-100%);
+  animation: hint 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* Senza volo da scorrere (caricamento, fallback, prefers-reduced-motion) non serve */
+.flight:not(.is-3d) .scroll-hint {
+  display: none;
+}
+
+.scene-error {
+  position: absolute;
+  z-index: 2;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  background: rgba(30, 16, 12, 0.82);
+  font: 0.875rem/1.4 system-ui, sans-serif;
+}
+
+@keyframes hint {
+  0% { transform: translateY(-100%); }
+  60%, 100% { transform: translateY(100%); }
+}
+
+/* ---------- Schermi verticali ---------- */
+
+@media (max-aspect-ratio: 4 / 5) {
+  :root {
+    --focus-x: 0.47;
+    --balloon-x: 54%;
+    --balloon-y: 43%;
+    --balloon-h: 10%;
+  }
+}

@@ -29,7 +29,7 @@ const CAMERA = { fov: 30, advance: 0.45, shiftX: 0.14, shiftY: 0.03 };
 
 // Profondita' e composizione iniziale in continuita' con il fallback statico.
 const BALLOON = {
-  model: "models/balloon.glb",
+  model: "models/balloon.optimized.glb",
   pivot: 0.38, // perno dell'oscillazione, dall'alto: il centro dell'involucro
   startDepth: 5,
   wide:     { x: 52, y: 37, depth: 7.4 },

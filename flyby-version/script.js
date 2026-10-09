@@ -7,7 +7,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ASSETS = {
   photo: "../depth-version/images/landscape.jpg",
-  model: "../depth-version/models/balloon.glb",
+  model: "../depth-version/models/balloon.optimized.glb",
   width: 2752,
   height: 1536
 };

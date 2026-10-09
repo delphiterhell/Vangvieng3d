@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vang Vieng Adventures — Voli in mongolfiera</title>
+  <meta name="description" content="Voli in mongolfiera all’alba e al tramonto sopra le montagne e le risaie di Vang Vieng, Laos.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 18 24%27%3E%3Cpath d=%27M9 1.2C4.6 1.2 1.6 4.5 1.6 8.6c0 4 3.2 7 5 8.9h4.8c1.8-1.9 5-4.9 5-8.9 0-4.1-3-7.4-7.4-7.4z%27 fill=%27%238F2F24%27/%3E%3Crect x=%277.2%27 y=%2719.8%27 width=%273.6%27 height=%272.8%27 fill=%27%23D7A63A%27/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Montserrat+Alternates:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="assets/landscape.jpg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sections.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#valley" data-goto="valley">Vai al contenuto</a>
+
+  <header class="site-header" data-header>
+    <a class="logo" href="#top" aria-label="Vang Vieng Adventures — torna all’inizio">
+      <svg class="logo__mark" viewBox="0 0 18 24" aria-hidden="true"><path d="M9 1.2C4.6 1.2 1.6 4.5 1.6 8.6c0 4 3.2 7 5 8.9h4.8c1.8-1.9 5-4.9 5-8.9 0-4.1-3-7.4-7.4-7.4z" /><path d="M9 1.2C7 2.8 6 5.6 6 8.6s1.2 6.4 1.6 8.9M9 1.2c2 1.6 3 4.4 3 7.4s-1.2 6.4-1.6 8.9" /><path d="M7.2 17.5l.4 2.3M10.8 17.5l-.4 2.3" /><rect class="logo__basket" x="7.2" y="19.8" width="3.6" height="2.8" /></svg>
+      <span class="logo__text"><span>Vang Vieng</span><span>Adventures</span></span>
+    </a>
+
+    <!-- Compare solo durante il flyby, al posto delle voci di menu -->
+    <a class="skip-flight" href="#valley" data-goto="valley">Salta il volo</a>
+
+    <nav class="nav" aria-label="Principale">
+      <ul class="nav__list">
+        <li><a href="#valley" data-goto="valley">Esperienza</a></li>
+        <li><a href="#flights">Voli</a></li>
+        <li><a href="#about">Chi siamo</a></li>
+        <li><a href="#book" class="nav__book">Prenota</a></li>
+      </ul>
+    </nav>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="menu-toggle__text">Menu</span>
+      <span class="menu-toggle__lines" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu" data-menu hidden>
+    <nav aria-label="Menu mobile">
+      <ul class="mobile-menu__list">
+        <li><a href="#valley" data-goto="valley">Esperienza</a></li>
+        <li><a href="#flights">Voli</a></li>
+        <li><a href="#about">Chi siamo</a></li>
+        <li><a href="#book" class="mobile-menu__book">Prenota</a></li>
+      </ul>
+    </nav>
+    <div class="mobile-menu__foot">
+      <span class="motif motif--gold" aria-hidden="true"></span>
+      <p>18°55' N — 102°27' E<br>Vang Vieng, Lao PDR</p>
+    </div>
+  </div>
+
+  <main id="main">
+
+    <!-- VIAGGIO: hero, flyby e prima sezione condividono lo stesso palco.
+         Con la scena 3D attiva l'altezza di .journey è la durata dello scroll
+         (vedi --flight-length e --cut-length in style.css); senza, tutto torna
+         una pagina normale: hero statica e sezione sotto. -->
+    <div class="journey" data-journey>
+      <div class="stage">
+
+        <!-- ========== HERO + FLYBY ========== -->
+        <section class="hero" id="top" aria-labelledby="hero-title">
+
+          <!-- Fallback statico: resta visibile durante il caricamento,
+               senza WebGL e con prefers-reduced-motion -->
+          <div class="world">
+            <img class="world__photo" src="assets/landscape.jpg" alt="Alba sulle montagne carsiche di Vang Vieng, Laos" fetchpriority="high">
+            <img class="world__balloon" src="assets/balloon-fallback.webp" alt="Mongolfiera rossa in volo">
+          </div>
+
+          <!-- Scena 3D: panorama, mongolfiera GLB e foschia. Lo scroll muove la telecamera -->
+          <canvas class="gl" aria-hidden="true"></canvas>
+
+          <div class="hero__shade" aria-hidden="true"></div>
+
+          <div class="hero__content">
+            <h1 class="hero__title" id="hero-title">
+              <span class="hero__line hero__line--first">Mongolfiere</span>
+              <span class="hero__line hero__line--second">in Vang Vieng</span>
+            </h1>
+            <p class="hero__sub">Voli in mongolfiera per vedere il Laos dall'alto.</p>
+          </div>
+
+          <p class="hero__coords" aria-label="Coordinate: 18 gradi 55 primi nord, 102 gradi 27 primi est">
+            18°55' N<br> 102°27' E
+          </p>
+
+          <div class="loader" role="status" aria-live="polite"></div>
+          <div class="scroll-hint" aria-hidden="true"><i></i></div>
+        </section>
+
+        <!-- ========== COME INIZIA ========== -->
+        <!-- Con la scena attiva la fotografia entra nella scia della mongolfiera,
+             riempie il palco e poi si ridimensiona fino a .opening__frame -->
+        <section class="opening" id="valley" aria-labelledby="opening-title">
+          <div class="opening__paper" aria-hidden="true"></div>
+          <div class="opening__grid container">
+            <div class="opening__frame">
+              <figure class="opening__figure">
+                <img src="assets/come-inizia-2048.webp"
+                     srcset="assets/come-inizia-1200.webp 1200w, assets/come-inizia-2048.webp 2048w"
+                     sizes="100vw" width="2048" height="1360" decoding="async"
+                     alt="Una mongolfiera rossa sopra le risaie di Vang Vieng, con i picchi calcarei nella foschia">
+              </figure>
+            </div>
+            <div class="opening__text">
+              <span class="motif" aria-hidden="true"></span>
+              <h2 class="opening__title" id="opening-title" tabindex="-1"><span>Come inizia</span></h2>
+              <p class="opening__lead">Pick-up, briefing, decollo.</p>
+              <div class="opening__body">
+                <p>Si parte prima dell’alba dal centro di Vang Vieng. Una volta raggiunto il punto di partenza, l’equipaggio prepara la mongolfiera e spiega le indicazioni di sicurezza prima del decollo.</p>
+                <p>Il volo dura in media 45–60 minuti, in base al vento e alle condizioni meteo.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ========== ALBA / TRAMONTO ========== -->
+    <!-- Due atmosfere sulla stessa valle: la scelta cambia fotografia, luce e colori.
+         Entrando, la fotografia si apre da una finestra sulla carta fino a tutto schermo -->
+    <section class="skies" id="flights" aria-labelledby="skies-title" data-sky="alba">
+      <div class="skies__media" data-window>
+        <img class="skies__photo skies__photo--alba"
+             src="assets/alba-2048.webp" srcset="assets/alba-1200.webp 1200w, assets/alba-2048.webp 2048w"
+             sizes="100vw" width="2048" height="1360" loading="lazy" decoding="async"
+             alt="La valle all’alba, con la foschia sul fiume">
+        <img class="skies__photo skies__photo--tramonto"
+             src="assets/tramonto-2048.webp" srcset="assets/tramonto-1200.webp 1200w, assets/tramonto-2048.webp 2048w"
+             sizes="100vw" width="2048" height="1360" loading="lazy" decoding="async"
+             alt="Luce dorata sulle montagne calcaree al tramonto">
+        <div class="skies__veil skies__veil--alba" aria-hidden="true"></div>
+        <div class="skies__veil skies__veil--tramonto" aria-hidden="true"></div>
+      </div>
+
+      <div class="skies__content container">
+        <header class="skies__head">
+          <h2 class="skies__title" id="skies-title" data-reveal>Due cieli. <em>Scegline uno.</em></h2>
+          <p class="skies__intro" data-reveal>Stessa valle, stessa mongolfiera. Una luce diversa, un silenzio diverso.</p>
+        </header>
+
+        <div class="skies__foot">
+          <div class="skies__panels" aria-live="polite">
+            <div class="sky sky--alba" data-sky-panel="alba">
+              <p class="sky__time">05:30</p>
+              <p class="sky__meta">Foschia · Aria fresca · Prima luce</p>
+            </div>
+            <div class="sky sky--tramonto" data-sky-panel="tramonto" aria-hidden="true">
+              <p class="sky__time">17:30</p>
+              <p class="sky__meta">Montagne dorate · Cielo caldo</p>
+            </div>
+          </div>
+
+          <fieldset class="skies__switch">
+            <legend class="visually-hidden">Scegli il cielo</legend>
+            <label class="skies__option">
+              <input type="radio" name="sky" value="alba" checked>
+              <span>Alba</span>
+            </label>
+            <span class="skies__thread" aria-hidden="true"></span>
+            <label class="skies__option">
+              <input type="radio" name="sky" value="tramonto">
+              <span>Tramonto</span>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== IL VOLO ========== -->
+    <section class="info" id="info" aria-labelledby="info-title">
+      <div class="info__grid container">
+        <div class="info__head">
+          <h2 class="info__title rise" id="info-title" data-reveal><span>Il <em>volo</em></span></h2>
+          <p class="info__note" data-reveal>
+            <span class="motif motif--short" aria-hidden="true"></span>
+            I voli dipendono dal meteo. Se il vento dice di no, voliamo un’altra mattina, oppure ti rimborsiamo per intero.
+          </p>
+        </div>
+
+        <dl class="facts">
+          <div class="fact" data-reveal>
+            <dt class="fact__label">Durata</dt>
+            <dd class="fact__body"><span class="fact__value">45–60 <small>min</small></span><span class="fact__note">in volo</span></dd>
+          </div>
+          <div class="fact" data-reveal>
+            <dt class="fact__label">Partenze</dt>
+            <dd class="fact__body"><span class="fact__value">Alba <i>/</i> Tramonto</span><span class="fact__note">partenze ogni giorno</span></dd>
+          </div>
+          <div class="fact" data-reveal>
+            <dt class="fact__label">Trasferimento</dt>
+            <dd class="fact__body"><span class="fact__value">Transfer <em>dall’hotel</em></span><span class="fact__note">incluso</span></dd>
+          </div>
+          <div class="fact" data-reveal>
+            <dt class="fact__label">A bordo</dt>
+            <dd class="fact__body"><span class="fact__value">Piccoli <em>gruppi</em></span><span class="fact__note">per ogni volo</span></dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Il colore della carta sfuma nella giada della mappa -->
+    <div class="seam seam--to-jade" aria-hidden="true"></div>
+
+    <!-- ========== ROTTA ========== -->
+    <!-- Su desktop la sezione resta ferma mentre lo scroll disegna la rotta -->
+    <section class="route" id="route" aria-labelledby="route-title">
+      <div class="route__stage">
+        <div class="route__grid container">
+          <div class="route__text">
+            <h2 class="route__title rise" id="route-title" data-reveal><span>Dove decide <em>il vento.</em></span></h2>
+            <p class="route__body" data-reveal>Nessun volo segue la stessa linea. Partiamo dai campi a ovest del fiume e lasciamo che l’aria del mattino scelga la direzione: quasi sempre verso nord, lungo il Nam Song, sopra i picchi.</p>
+            <ul class="route__legend">
+              <li data-legend="launch"><i class="lg lg--launch"></i>Campo di decollo</li>
+              <li data-legend="route"><i class="lg lg--route"></i>Rotta tipica</li>
+              <li data-legend="river"><i class="lg lg--river"></i>Nam Song</li>
+            </ul>
+          </div>
+          <figure class="route__map" data-map aria-label="Mappa stilizzata di Vang Vieng con il fiume Nam Song, la città, le montagne calcaree, il campo di decollo e la rotta tratteggiata della mongolfiera">
+            <svg viewBox="0 0 800 820" role="img" aria-hidden="true">
+              <defs>
+                <!-- Karst hill symbol -->
+                <symbol id="karst" viewBox="0 0 60 50" overflow="visible">
+                  <path class="karst__body" d="M2 50 C8 44 10 20 18 12 C22 8 25 4 30 3 C35 4 39 10 42 18 C46 28 52 42 58 50 Z" />
+                  <path class="karst__hatch" d="M22 16 L20 46 M28 8 L27 47 M35 10 L36 47 M41 20 L44 46" />
+                </symbol>
+                <!-- Rice field hatch -->
+                <pattern id="rice" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)">
+                  <path d="M0 4h8" class="rice__line" />
+                </pattern>
+                <!-- Mask that progressively "draws" the dashed route -->
+                <mask id="route-mask" maskUnits="userSpaceOnUse">
+                  <path class="route__mask-path" data-route-mask d="M210 610 C 250 540, 330 560, 360 480 S 330 360, 410 300 S 560 250, 540 170 S 600 90, 660 80" />
+                </mask>
+              </defs>
+
+              <!-- Frame + coordinates -->
+              <rect class="map__frame" x="12" y="12" width="776" height="796" />
+              <text class="map__coord" x="28" y="36">18°58' N</text>
+              <text class="map__coord" x="772" y="36" text-anchor="end">102°29' E</text>
+              <text class="map__coord" x="28" y="794">18°53' N</text>
+              <text class="map__coord" x="772" y="794" text-anchor="end">102°25' E</text>
+
+              <!-- Contour lines -->
+              <g class="map__contours">
+                <path d="M40 180 C160 140 240 220 360 190 S560 120 760 170" />
+                <path d="M40 230 C170 190 250 270 370 240 S570 170 760 225" />
+                <path d="M520 420 C590 380 680 400 760 380" />
+                <path d="M540 460 C610 430 690 450 760 430" />
+                <path d="M40 700 C140 670 230 720 330 690" />
+              </g>
+
+              <!-- Rice fields (west bank) -->
+              <g class="map__rice">
+                <path d="M80 520 L180 500 L200 570 L95 590 Z" fill="url(#rice)" />
+                <path d="M110 610 L200 595 L215 650 L120 668 Z" fill="url(#rice)" />
+                <path d="M70 420 L160 410 L170 470 L80 482 Z" fill="url(#rice)" />
+                <path d="M230 650 L300 640 L310 700 L240 710 Z" fill="url(#rice)" />
+              </g>
+              <text class="map__label map__label--muted" x="92" y="400">Risaie</text>
+
+              <!-- Nam Song river -->
+              <path id="river" class="map__river" d="M300 820 C 320 740, 280 690, 330 620 S 420 540, 400 460 S 360 360, 430 290 S 520 200, 500 120 S 520 40, 560 0" />
+              <path class="map__river-core" d="M300 820 C 320 740, 280 690, 330 620 S 420 540, 400 460 S 360 360, 430 290 S 520 200, 500 120 S 520 40, 560 0" />
+              <text class="map__label map__label--river" data-map="river-label">
+                <textPath href="#river" startOffset="36%">Nam Song</textPath>
+              </text>
+
+              <!-- Limestone karsts (east + north) -->
+              <g class="map__karsts">
+                <use href="#karst" x="560" y="300" width="70" height="58" />
+                <use href="#karst" x="610" y="320" width="90" height="74" />
+                <use href="#karst" x="680" y="290" width="60" height="50" />
+                <use href="#karst" x="590" y="370" width="54" height="44" />
+                <use href="#karst" x="660" y="380" width="80" height="66" />
+                <use href="#karst" x="520" y="520" width="64" height="52" />
+                <use href="#karst" x="580" y="540" width="96" height="80" />
+                <use href="#karst" x="670" y="560" width="70" height="58" />
+                <use href="#karst" x="600" y="630" width="56" height="46" />
+                <use href="#karst" x="220" y="90" width="80" height="66" />
+                <use href="#karst" x="290" y="70" width="60" height="50" />
+                <use href="#karst" x="140" y="120" width="64" height="52" />
+                <use href="#karst" x="340" y="110" width="50" height="42" />
+                <use href="#karst" x="620" y="110" width="70" height="58" />
+                <use href="#karst" x="690" y="130" width="54" height="44" />
+              </g>
+              <text class="map__label map__label--muted" x="600" y="480">Picchi calcarei</text>
+              <text class="map__label map__label--muted" x="170" y="60">Pha Ngeun</text>
+
+              <!-- Town -->
+              <g class="map__town">
+                <rect x="420" y="560" width="8" height="8" />
+                <rect x="434" y="552" width="6" height="6" />
+                <rect x="446" y="566" width="9" height="7" />
+                <rect x="428" y="578" width="7" height="7" />
+                <rect x="442" y="584" width="8" height="6" />
+                <rect x="456" y="548" width="6" height="6" />
+                <rect x="416" y="596" width="6" height="6" />
+                <circle cx="440" cy="572" r="30" class="map__town-ring" />
+              </g>
+              <text class="map__label map__label--town" x="482" y="578">Vang Vieng</text>
+              <text class="map__label map__label--small" x="482" y="596">città</text>
+
+              <!-- Road 13 -->
+              <path class="map__road" d="M470 820 C 460 740, 450 660, 440 600 S 450 480, 470 400" />
+              <text class="map__label map__label--small" x="478" y="760">Strada 13 → Vientiane</text>
+
+              <!-- Dashed balloon route (revealed by mask) -->
+              <path class="map__route" mask="url(#route-mask)" d="M210 610 C 250 540, 330 560, 360 480 S 330 360, 410 300 S 560 250, 540 170 S 600 90, 660 80" />
+              <path class="map__route-guide" data-route d="M210 610 C 250 540, 330 560, 360 480 S 330 360, 410 300 S 560 250, 540 170 S 600 90, 660 80" />
+
+              <!-- Launch area -->
+              <g class="map__launch" data-map="launch" transform="translate(210 610)">
+                <circle r="16" />
+                <circle r="4" class="map__launch-dot" />
+                <path d="M-24 0h-8M24 0h8M0 -24v-8M0 24v8" />
+              </g>
+              <text class="map__label" data-map="launch-label" x="120" y="652">Campo di decollo</text>
+
+              <!-- Landing (varies) -->
+              <g class="map__landing" data-map="landing" transform="translate(660 80)">
+                <path d="M-7 -7L7 7M7 -7L-7 7" />
+              </g>
+              <text class="map__label map__label--small" data-map="landing-label" x="676" y="72">Atterraggio</text>
+              <text class="map__label map__label--small" data-map="landing-label" x="676" y="88">variabile</text>
+
+              <!-- Balloon marker (moves along the route on scroll) -->
+              <g class="map__balloon" data-map-balloon transform="translate(540 170)">
+                <path d="M0 -26c-9 0-15 7-15 15 0 7 6 12 10 16h10c4-4 10-9 10-16 0-8-6-15-15-15z" />
+                <path d="M-5 5l1 6M5 5l-1 6" class="map__balloon-rope" />
+                <rect x="-4" y="11" width="8" height="6" />
+              </g>
+
+              <!-- Compass -->
+              <g class="map__compass" transform="translate(720 730)">
+                <path d="M0 -30 L7 0 L0 30 L-7 0 Z" />
+                <path d="M0 -30 L7 0 L-7 0 Z" class="map__compass-n" />
+                <text y="-38" text-anchor="middle">N</text>
+              </g>
+
+              <!-- Scale bar -->
+              <g class="map__scale" transform="translate(40 750)">
+                <path d="M0 0h120M0 -5v10M60 -3v6M120 -5v10" />
+                <text x="0" y="22">0</text>
+                <text x="120" y="22" text-anchor="middle">1 km</text>
+              </g>
+            </svg>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <div class="seam seam--to-paper" aria-hidden="true"></div>
+
+    <!-- ========== CHI SIAMO ========== -->
+    <section class="about" id="about" aria-labelledby="about-title">
+      <div class="about__head container">
+        <p class="label" data-reveal>Chi siamo</p>
+        <h2 class="about__title rise" id="about-title" data-reveal><span>Volare <em>con</em> la valle.</span></h2>
+        <p class="about__intro" data-reveal>Siamo un piccolo team con base a Vang Vieng. Voliamo in questa valle ogni stagione, e preferiamo rinunciare a una mattina piuttosto che forzarla.</p>
+      </div>
+
+      <figure class="about__photo" data-unveil>
+        <img src="assets/valle-2400.webp" srcset="assets/valle-1200.webp 1200w, assets/valle-2400.webp 2400w"
+             sizes="100vw" width="2400" height="1340" loading="lazy" decoding="async"
+             alt="La valle di Vang Vieng dall’alto: il fiume Nam Song tra le risaie, con i picchi calcarei sullo sfondo">
+      </figure>
+
+      <ol class="about__list container">
+        <li class="trust" data-reveal>
+          <span class="trust__mark" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 1 L19 10 L10 19 L1 10 Z" /><circle cx="10" cy="10" r="2" /></svg></span>
+          <h3>Piloti esperti</h3>
+          <p>Con licenza, e abituati a questi venti. Quasi tutti hanno alle spalle centinaia di mattine qui.</p>
+        </li>
+        <li class="trust" data-reveal>
+          <span class="trust__mark" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 1 L19 10 L10 19 L1 10 Z" /><path d="M5 10h10" /></svg></span>
+          <h3>Partenze in base al meteo</h3>
+          <p>Ogni volo viene confermato la sera prima, e di nuovo al campo.</p>
+        </li>
+        <li class="trust" data-reveal>
+          <span class="trust__mark" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 1 L19 10 L10 19 L1 10 Z" /><path d="M10 5v10M5 10h10" /></svg></span>
+          <h3>Briefing completo prima del volo</h3>
+          <p>Come stare nel cesto, dove tenersi, cosa succede all’atterraggio. Dieci minuti tranquilli prima di partire.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ========== PRENOTAZIONE ========== -->
+    <!-- Lo stesso panorama della hero: il viaggio si chiude dove era cominciato -->
+    <section class="final" id="book" aria-labelledby="final-title">
+      <figure class="final__media" data-window>
+        <img src="assets/landscape-2752.webp" srcset="assets/landscape-1400.webp 1400w, assets/landscape-2752.webp 2752w"
+             sizes="100vw" width="2752" height="1536" loading="lazy" decoding="async"
+             alt="Alba sulle montagne carsiche di Vang Vieng, Laos">
+      </figure>
+      <div class="final__content container">
+        <h2 class="final__title" id="final-title">
+          <span class="rise" data-reveal><span>Il mattino,</span></span>
+          <span class="rise" data-reveal><span><em>visto da lassù.</em></span></span>
+        </h2>
+        <a class="cta" href="mailto:hello@vangviengadventures.la?subject=Prenotazione%20volo" data-reveal>
+          <span>Scegli il tuo volo</span>
+          <svg viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
+        </a>
+        <p class="final__meta" data-reveal>Vang Vieng · Laos<br>Voli all’alba e al tramonto</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span class="motif motif--gold" aria-hidden="true"></span>
+    <div class="footer__grid container">
+      <div class="footer__brand">
+        <a class="logo" href="#top" aria-label="Vang Vieng Adventures — torna su">
+          <svg class="logo__mark" viewBox="0 0 18 24" aria-hidden="true"><path d="M9 1.2C4.6 1.2 1.6 4.5 1.6 8.6c0 4 3.2 7 5 8.9h4.8c1.8-1.9 5-4.9 5-8.9 0-4.1-3-7.4-7.4-7.4z" /><path d="M9 1.2C7 2.8 6 5.6 6 8.6s1.2 6.4 1.6 8.9M9 1.2c2 1.6 3 4.4 3 7.4s-1.2 6.4-1.6 8.9" /><path d="M7.2 17.5l.4 2.3M10.8 17.5l-.4 2.3" /><rect class="logo__basket" x="7.2" y="19.8" width="3.6" height="2.8" /></svg>
+          <span class="logo__text"><span>Vang Vieng</span><span>Adventures</span></span>
+        </a>
+        <p class="footer__tag">Il Laos, dall’alto.</p>
+      </div>
+      <nav class="footer__nav" aria-label="Footer">
+        <ul>
+          <li><a href="#valley" data-goto="valley">Esperienza</a></li>
+          <li><a href="#flights">Voli</a></li>
+          <li><a href="#about">Chi siamo</a></li>
+          <li><a href="#book">Prenota</a></li>
+        </ul>
+      </nav>
+      <ul class="footer__contact">
+        <li><a href="mailto:hello@vangviengadventures.la">hello@vangviengadventures.la</a></li>
+      </ul>
+    </div>
+    <div class="footer__base container">
+      <p>Vang Vieng · Lao PDR</p>
+      <p>© <span data-year></span> Vang Vieng Adventures</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script type="module" src="main.js"></script>
+  <script type="module" src="sections.js"></script>
+</body>
+</html>

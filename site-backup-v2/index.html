@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vang Vieng Adventures — Voli in mongolfiera</title>
+  <meta name="description" content="Voli in mongolfiera all’alba e al tramonto sopra le montagne e le risaie di Vang Vieng, Laos.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 18 24%27%3E%3Cpath d=%27M9 1.2C4.6 1.2 1.6 4.5 1.6 8.6c0 4 3.2 7 5 8.9h4.8c1.8-1.9 5-4.9 5-8.9 0-4.1-3-7.4-7.4-7.4z%27 fill=%27%238F2F24%27/%3E%3Crect x=%277.2%27 y=%2719.8%27 width=%273.6%27 height=%272.8%27 fill=%27%23D7A63A%27/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Montserrat+Alternates:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="assets/landscape.jpg">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#valley" data-goto="valley">Vai al contenuto</a>
+
+  <header class="site-header" data-header>
+    <a class="logo" href="#top" aria-label="Vang Vieng Adventures — home">
+      <svg class="logo__mark" viewBox="0 0 18 24" aria-hidden="true"><path d="M9 1.2C4.6 1.2 1.6 4.5 1.6 8.6c0 4 3.2 7 5 8.9h4.8c1.8-1.9 5-4.9 5-8.9 0-4.1-3-7.4-7.4-7.4z" /><path d="M9 1.2C7 2.8 6 5.6 6 8.6s1.2 6.4 1.6 8.9M9 1.2c2 1.6 3 4.4 3 7.4s-1.2 6.4-1.6 8.9" /><path d="M7.2 17.5l.4 2.3M10.8 17.5l-.4 2.3" /><rect class="logo__basket" x="7.2" y="19.8" width="3.6" height="2.8" /></svg>
+      <span class="logo__text"><span>Vang Vieng</span><span>Adventures</span></span>
+    </a>
+    <nav class="nav" aria-label="Principale">
+      <ul class="nav__list">
+        <li><a href="#valley" data-goto="valley">Esperienza</a></li>
+        <li><a href="mailto:hello@vangviengadventures.la?subject=Prenotazione%20volo" class="nav__book">Prenota</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- VIAGGIO: hero, flyby e prima sezione condividono lo stesso palco.
+         Con la scena 3D attiva l'altezza di .journey è la durata dello scroll
+         (vedi --flight-length e --cut-length in style.css); senza, tutto torna
+         una pagina normale: hero statica e sezione sotto. -->
+    <div class="journey" data-journey>
+      <div class="stage">
+
+        <!-- ========== HERO + FLYBY ========== -->
+        <section class="hero" id="top" aria-labelledby="hero-title">
+
+          <!-- Fallback statico: resta visibile durante il caricamento,
+               senza WebGL e con prefers-reduced-motion -->
+          <div class="world">
+            <img class="world__photo" src="assets/landscape.jpg" alt="Alba sulle montagne carsiche di Vang Vieng, Laos" fetchpriority="high">
+            <img class="world__balloon" src="assets/balloon-fallback.webp" alt="Mongolfiera rossa in volo">
+          </div>
+
+          <!-- Scena 3D: panorama, mongolfiera GLB e foschia. Lo scroll muove la telecamera -->
+          <canvas class="gl" aria-hidden="true"></canvas>
+
+          <div class="hero__shade" aria-hidden="true"></div>
+
+          <div class="hero__content">
+            <h1 class="hero__title" id="hero-title">
+              <span class="hero__line hero__line--first">Mongolfiere</span>
+              <span class="hero__line hero__line--second">in Vang Vieng</span>
+            </h1>
+            <p class="hero__sub">Voli in mongolfiera per vedere il Laos dall'alto.</p>
+          </div>
+
+          <p class="hero__coords" aria-label="Coordinate: 18 gradi 55 primi nord, 102 gradi 27 primi est">
+            18°55' N<br> 102°27' E
+          </p>
+
+          <div class="loader" role="status" aria-live="polite"></div>
+          <div class="scroll-hint" aria-hidden="true"><i></i></div>
+        </section>
+
+        <!-- ========== COME INIZIA ========== -->
+        <!-- Con la scena attiva la fotografia riempie il palco, dissolve sopra il
+             panorama finale e poi si restringe fino a .opening__frame -->
+        <section class="opening" id="valley" aria-labelledby="opening-title">
+          <div class="opening__paper" aria-hidden="true"></div>
+          <div class="opening__grid container">
+            <div class="opening__frame">
+              <figure class="opening__figure">
+                <img src="assets/come-inizia-2048.webp"
+                     srcset="assets/come-inizia-1200.webp 1200w, assets/come-inizia-2048.webp 2048w"
+                     sizes="100vw" width="2048" height="1360" decoding="async"
+                     alt="Una mongolfiera rossa sopra le risaie di Vang Vieng, con i picchi calcarei nella foschia">
+              </figure>
+            </div>
+            <div class="opening__text">
+              <span class="motif" aria-hidden="true"></span>
+              <h2 class="opening__title" id="opening-title" tabindex="-1"><span>Come inizia</span></h2>
+              <p class="opening__lead">Pick-up, briefing, decollo.</p>
+              <div class="opening__body">
+                <p>Si parte prima dell’alba dal centro di Vang Vieng. Una volta raggiunto il punto di partenza, l’equipaggio prepara la mongolfiera e spiega le indicazioni di sicurezza prima del decollo.</p>
+                <p>Il volo dura in media 45–60 minuti, in base al vento e alle condizioni meteo.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__brand">Vang Vieng Adventures <span>Il Laos, dall’alto.</span></p>
+      <p class="footer__meta">
+        <a href="mailto:hello@vangviengadventures.la">hello@vangviengadventures.la</a>
+        <span>Vang Vieng · Lao PDR</span>
+        <span>© Vang Vieng Adventures</span>
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

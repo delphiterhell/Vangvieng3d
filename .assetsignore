@@ -1,0 +1,8 @@
+# File esclusi dal deploy su Cloudflare (limite di 25 MiB per asset)
+depth-version/models/balloon.glb
+depth-version/models/balloon.original.glb
+
+.git
+.claude
+.wrangler
+node_modules

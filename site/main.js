@@ -41,19 +41,36 @@ let direction = null;
 
 /* ---------- Header e navigazione ---------- */
 
-// L'header è crema sopra immagini e footer, inchiostro sopra la carta
+// Sul palco del viaggio l'header è trasparente: crema sulle immagini, inchiostro
+// sulla carta, e durante il flyby lascia solo "Salta il volo" e "Prenota".
+// Dopo il viaggio è una fascia di carta che si ritira scendendo e torna risalendo.
+let lastScroll = window.scrollY;
 function updateHeader() {
   const line = header.offsetHeight / 2;
-  let paper;
+  const scroll = window.scrollY;
+  let onStage;
+  let paper = false;
+  let flying = false;
   if (direction) {
-    paper = direction.time() >= direction.paperAt && stage.getBoundingClientRect().bottom > line;
+    const time = direction.time();
+    // il palco conta finché è fermo in alto: quando scorre via torna la fascia di carta
+    const rect = stage.getBoundingClientRect();
+    onStage = rect.bottom > line && rect.top > -2;
+    paper = time >= direction.paperAt;
+    flying = onStage && time > direction.flyFrom && time < direction.flyTo;
   } else {
-    const rect = opening.getBoundingClientRect();
-    paper = rect.top <= line && rect.bottom > line;
+    // pagina statica: il palco è la sola hero
+    onStage = journey.querySelector(".hero").getBoundingClientRect().bottom > line;
   }
-  header.classList.toggle("is-paper", paper);
-  // Nella pagina statica il contenuto scorre sotto l'header: gli serve un fondo
-  header.classList.toggle("is-solid", paper && !direction);
+  header.classList.toggle("is-paper", !onStage || paper);
+  header.classList.toggle("is-solid", !onStage);
+  header.classList.toggle("is-flying", flying);
+  if (onStage) {
+    header.classList.remove("is-hidden");
+  } else if (Math.abs(scroll - lastScroll) > 6) {
+    header.classList.toggle("is-hidden", scroll > lastScroll);
+  }
+  if (Math.abs(scroll - lastScroll) > 6) lastScroll = scroll;
 }
 
 window.addEventListener("scroll", updateHeader, { passive: true });
@@ -177,7 +194,15 @@ function startJourney(flight) {
     }, cut(CUT.text[0]))
     .set({}, {}, cut(1));
 
-  direction = { time: () => timeline.time(), paperAt: cut(CUT.header) };
+  direction = {
+    time: () => timeline.time(),
+    paperAt: cut(CUT.header),
+    flyFrom: TITLE.start * L,
+    flyTo: L
+  };
+
+  // L'altezza della pagina è cambiata: le sezioni dopo ricalcolano le loro posizioni
+  ScrollTrigger.refresh();
 
   // Mongolfiera, foschia e telecamera respirano anche a scroll fermo, quindi si
   // disegna a ogni fotogramma: ma solo finché il canvas è visibile

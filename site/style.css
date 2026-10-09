@@ -566,51 +566,6 @@ a { color: inherit; text-decoration: none; }
   pointer-events: auto;
 }
 
-/* ---------- Footer ---------- */
-
-.footer {
-  position: relative;
-  padding-block: var(--space-m);
-  background: var(--ink);
-  color: var(--cream-80);
-  font-size: 13px;
-}
-
-.footer__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px 32px;
-}
-
-.footer__brand {
-  font-family: var(--display);
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  font-size: 11.5px;
-  color: var(--cream);
-}
-
-.footer__brand span {
-  margin-left: 14px;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 17px;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--saffron);
-}
-
-.footer__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 28px;
-}
-
-.footer__meta a:hover,
-.footer__meta a:focus-visible { color: var(--saffron); }
-
 /* ---------- Schermi stretti ---------- */
 
 @media (max-width: 900px) {

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vang Vieng — Volo in mongolfiera (esperimento)</title>
+  <link rel="preload" as="image" href="images/background.jpg">
+  <link rel="preload" as="image" href="images/mountain.png">
+  <link rel="preload" as="image" href="images/balloon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- La lunghezza di questa sezione è la "durata" del volo -->
+  <main class="flight">
+    <div class="stage">
+
+      <!-- Il "mondo": tutti i piani condividono il sistema di coordinate
+           della fotografia originale (2752 × 1536) -->
+      <div class="world">
+
+        <!-- PAESAGGIO: sfondo e montagna formano un unico blocco.
+             La camera muove soltanto questo gruppo, così i piani
+             restano sempre allineati tra loro -->
+        <div class="layer landscape">
+
+          <!-- cielo, montagne lontane, valle -->
+          <div class="layer background">
+            <img src="images/background.jpg" alt="Alba sulle montagne carsiche di Vang Vieng, Laos">
+          </div>
+
+          <!-- montagna principale -->
+          <div class="layer midground">
+            <img class="mountain" src="images/mountain.png" alt="">
+          </div>
+
+          <!-- foschia davanti alla montagna e luce calda dell'alba -->
+          <div class="layer haze" aria-hidden="true"></div>
+          <div class="layer sunglow" aria-hidden="true"></div>
+
+        </div>
+
+        <!-- MONGOLFIERA: indipendente dal paesaggio
+             layer: traiettoria · path: profondità · sway: oscillazione del vento -->
+        <div class="layer balloon-layer">
+          <div class="balloon-path">
+            <div class="balloon-sway">
+              <img class="balloon" src="images/balloon.png" alt="Mongolfiera rossa in volo">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="layer vignette" aria-hidden="true"></div>
+
+      <div class="scroll-hint" aria-hidden="true"><span></span></div>
+
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

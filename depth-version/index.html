@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vang Vieng — Depth map + Three.js (esperimento)</title>
+  <link rel="preload" as="image" href="images/landscape.jpg">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <!-- La lunghezza di questa sezione è la "durata" del volo -->
+  <main class="flight">
+    <div class="stage">
+
+      <!-- Fallback statico: la fotografia originale. Resta visibile se WebGL
+           non è disponibile o con prefers-reduced-motion -->
+      <div class="world">
+        <img class="fallback" src="images/landscape.jpg" alt="Alba sulle montagne carsiche di Vang Vieng, Laos">
+      </div>
+
+      <!-- SCENA 3D: la stessa fotografia su una mesh deformata dalla depth map,
+           con il modello GLB della mongolfiera -->
+      <canvas class="layer gl" aria-hidden="true"></canvas>
+
+      <!-- Sopra il paesaggio, nello stesso sistema di coordinate della fotografia -->
+      <div class="world">
+        <div class="layer sunglow" aria-hidden="true"></div>
+
+        <!-- MONGOLFIERA in HTML: solo per il fallback statico.
+             Con la scena 3D attiva è un oggetto Three.js dentro il canvas -->
+        <div class="layer balloon-layer">
+          <div class="balloon-path">
+            <div class="balloon-sway">
+              <img class="balloon" src="images/balloon.png" alt="Mongolfiera rossa in volo">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer vignette" aria-hidden="true"></div>
+
+      <div class="scroll-hint" aria-hidden="true"><span></span></div>
+      <div class="scene-error" role="alert" hidden></div>
+
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script type="module" src="script.js?v=20261009-3"></script>
+</body>
+</html>

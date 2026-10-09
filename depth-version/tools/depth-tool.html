@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generatore depth map — Depth Anything V2</title>
+  <style>
+    body { margin: 0; padding: 24px; font: 15px/1.5 system-ui, sans-serif; background: #10151f; color: #dfe5ee; }
+    button { font: inherit; padding: 8px 16px; cursor: pointer; }
+    canvas { display: block; max-width: 100%; margin-top: 16px; }
+    #status { margin: 12px 0; white-space: pre-wrap; }
+    a { color: #9cc4ff; }
+  </style>
+</head>
+<body>
+  <!-- Strumento di servizio: genera images/depth.png dalla fotografia
+       con il modello di stima monoculare Depth Anything V2 (Small).
+       Il modello (~100 MB) viene scaricato da Hugging Face al primo uso
+       ed eseguito in locale nel browser. -->
+  <h1>Depth map di <code>images/landscape.jpg</code></h1>
+  <button id="run">Genera depth map</button>
+  <a id="download" download="depth.png" hidden>Scarica depth.png</a>
+  <div id="status">Pronto.</div>
+  <canvas id="out"></canvas>
+
+  <script type="module">
+    import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2";
+
+    const SOURCE = "../images/landscape.jpg";
+    const MODEL = "onnx-community/depth-anything-v2-small";
+    const OUTPUT_WIDTH = 1376; // metà della fotografia: più che sufficiente per la griglia 3D
+
+    const status = document.getElementById("status");
+    const canvas = document.getElementById("out");
+    const say = (text) => { status.textContent = text; window.__depthStatus = text; };
+
+    async function run() {
+      say("Scarico il modello…");
+      const estimator = await pipeline("depth-estimation", MODEL, {
+        dtype: "fp32",
+        progress_callback: (p) => { if (p.status === "progress") say(`Scarico ${p.file}: ${Math.round(p.progress)}%`); }
+      });
+
+      say("Stimo la profondità…");
+      const { depth } = await estimator(new URL(SOURCE, location.href).href);
+
+      // "depth" è un'immagine a 8 bit grande quanto la foto: bianco = vicino, nero = lontano
+      const full = new OffscreenCanvas(depth.width, depth.height);
+      const pixels = new ImageData(depth.width, depth.height);
+      for (let i = 0; i < depth.width * depth.height; i++) {
+        const v = depth.data[i * depth.channels];
+        pixels.data.set([v, v, v, 255], i * 4);
+      }
+      full.getContext("2d").putImageData(pixels, 0, 0);
+
+      canvas.width = OUTPUT_WIDTH;
+      canvas.height = Math.round(OUTPUT_WIDTH * depth.height / depth.width);
+      const ctx = canvas.getContext("2d");
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(full, 0, 0, canvas.width, canvas.height);
+
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      const link = document.getElementById("download");
+      link.href = URL.createObjectURL(blob);
+      link.hidden = false;
+
+      // Con il server di anteprima del progetto il file viene salvato direttamente;
+      // altrimenti usa il link e copialo in depth-version/images/depth.png
+      const saved = await fetch("/__save-depth", { method: "POST", body: blob }).then((r) => r.ok).catch(() => false);
+      say(saved
+        ? `Fatto: salvata in images/depth.png (${canvas.width}×${canvas.height}).`
+        : `Fatto (${canvas.width}×${canvas.height}). Scarica il file e copialo in images/depth.png.`);
+    }
+
+    document.getElementById("run").addEventListener("click", () => run().catch((e) => say("Errore: " + e.message)));
+    window.__runDepth = () => run().catch((e) => say("Errore: " + e.message));
+  </script>
+</body>
+</html>

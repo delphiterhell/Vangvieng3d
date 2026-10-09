@@ -1,0 +1,197 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Proporzioni della fotografia originale: il sistema di coordinate comune */
+  --world-ratio: 2752 / 1536;
+
+  /* Posizione iniziale e altezza della mongolfiera, in % del mondo */
+  --balloon-x: 62%;
+  --balloon-y: 42%;
+  --balloon-h: 15%;
+
+  /* Quale punto del mondo resta inquadrato quando lo schermo lo ritaglia (0–1).
+     Letti anche da script.js per inquadrare la scena 3D allo stesso modo */
+  --focus-x: 0.5;
+  --focus-y: 0.45;
+}
+
+html,
+body {
+  margin: 0;
+  background: #0d1420;
+}
+
+/* Senza scena 3D la pagina è una composizione statica a tutto schermo.
+   Con la scena attiva, l'altezza della sezione = quanto scroll serve per completare il volo */
+.flight.is-3d {
+  height: 600vh;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: #0d1420;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ---------- Mondo ---------- */
+
+/* Copre sempre lo schermo mantenendo le proporzioni della fotografia */
+.world {
+  --world-w: max(100vw, 100vh * var(--world-ratio));
+  --world-w: max(100vw, 100svh * var(--world-ratio));
+  position: absolute;
+  width: var(--world-w);
+  aspect-ratio: var(--world-ratio);
+  left: calc((100% - var(--world-w)) * var(--focus-x));
+  top: calc((100% - var(--world-w) / (var(--world-ratio))) * var(--focus-y));
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.stage.is-ready .world {
+  opacity: 1;
+}
+
+.fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Paesaggio 3D ---------- */
+
+.gl {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.flight.is-3d .gl {
+  opacity: 1;
+}
+
+.flight.is-3d-static .gl {
+  opacity: 1;
+}
+
+/* Con la scena 3D attiva la mongolfiera è dentro il canvas:
+   quella in HTML resta solo per il fallback statico */
+.flight.is-3d .balloon-layer,
+.flight.is-3d-static .balloon-layer {
+  visibility: hidden;
+}
+
+/* ---------- Atmosfera ---------- */
+
+.sunglow {
+  background: radial-gradient(50% 55% at 2% 34%, rgba(255, 190, 120, 0.36), rgba(255, 170, 110, 0.08) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+
+.vignette {
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(8, 12, 22, 0.42) 100%),
+    linear-gradient(to bottom, rgba(8, 12, 22, 0.10), transparent 22%, transparent 78%, rgba(8, 12, 22, 0.28));
+}
+
+/* ---------- Mongolfiera ---------- */
+
+/* Versione HTML, statica: è il fallback e definisce posizione e altezza
+   di partenza che script.js riprende per la mongolfiera 3D */
+.balloon-path {
+  position: absolute;
+  left: var(--balloon-x);
+  top: var(--balloon-y);
+  height: var(--balloon-h);
+  aspect-ratio: 1536 / 2592;
+  translate: -50% -50%;
+}
+
+.balloon-sway {
+  width: 100%;
+  height: 100%;
+}
+
+.balloon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* velatura atmosferica di partenza: la mongolfiera è a media distanza */
+  filter: saturate(0.86) contrast(0.9) brightness(1.03);
+}
+
+/* ---------- Indicatore di scroll ---------- */
+
+.scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 4vh;
+  width: 1px;
+  height: 7vh;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.scroll-hint span {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-100%);
+  animation: hint 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.scene-error {
+  position: absolute;
+  z-index: 2;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  background: rgba(30, 16, 12, 0.82);
+  font: 0.875rem/1.4 system-ui, sans-serif;
+}
+
+@keyframes hint {
+  0% { transform: translateY(-100%); }
+  60%, 100% { transform: translateY(100%); }
+}
+
+/* ---------- Schermi verticali ---------- */
+
+@media (max-aspect-ratio: 4 / 5) {
+  :root {
+    /* inquadra il fianco della montagna e la valle, con la mongolfiera al centro */
+    --focus-x: 0.47;
+    --balloon-x: 54%;
+    --balloon-y: 41%;
+    --balloon-h: 13%;
+  }
+}
+
+/* ---------- Fallback statico ---------- */
+
+/* Senza WebGL, senza depth map o con prefers-reduced-motion la scena 3D
+   non parte (vedi script.js): non c'è nulla da scorrere */
+.flight:not(.is-3d) .scroll-hint {
+  display: none;
+}
+
+.flight.is-3d-static .scroll-hint {
+  display: none;
+}

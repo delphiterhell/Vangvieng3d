@@ -291,7 +291,7 @@ html {
 
 /* Il titolo passa dall'inchiostro al crema quando il cielo si scurisce */
 .skies__head {
-  max-width: 34rem;
+  max-width: 52rem;
   color: var(--ink);
   transition: color 1.6s var(--ease-slow);
 }
@@ -301,7 +301,7 @@ html {
 .skies__title {
   font-family: var(--title);
   font-weight: 400;
-  font-size: clamp(2.3rem, 4.6vw, 4.8rem);
+  font-size: clamp(2rem, 3.4vw, 3.8rem);
   line-height: 1.04;
   letter-spacing: -.03em;
 }
@@ -315,6 +315,18 @@ html {
 }
 
 .skies[data-sky="tramonto"] .skies__title em { color: var(--saffron); }
+
+/* La parola del cielo scelto si accende, l'altra si spegne */
+.skies__word {
+  opacity: .38;
+  transition: opacity 1.2s var(--ease-slow), text-shadow 1.2s var(--ease-slow);
+}
+
+.skies[data-sky="alba"] .skies__word[data-word="alba"],
+.skies[data-sky="tramonto"] .skies__word[data-word="tramonto"] {
+  opacity: 1;
+  text-shadow: 0 0 .28em rgba(255, 214, 140, .75), 0 0 .9em rgba(215, 166, 58, .45);
+}
 
 .skies__intro {
   margin-top: var(--space-s);
@@ -964,6 +976,7 @@ html {
   .sky,
   .skies__head,
   .skies__title em,
+  .skies__word,
   .skies__option span,
   .request,
   .request svg,

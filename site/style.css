@@ -1,6 +1,14 @@
 /* Vang Vieng Adventures — homepage immersiva
    Palette, caratteri, motivo tessile e grana vengono dal sito originale. */
 
+@font-face {
+  font-family: "Black Mango";
+  src: url("assets/fonts/BlackMango-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -19,10 +27,10 @@
   --cream-80: rgba(241, 231, 210, .8);
 
   /* Caratteri */
-  --serif: "Instrument Serif", "Times New Roman", Georgia, serif;
-  --sans:  "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --display: "Cocomat Pro", "Manrope", system-ui, sans-serif;
-  --title: "Montserrat Alternates", "Manrope", system-ui, sans-serif;
+  --serif: "Black Mango", "Instrument Serif", Georgia, serif;
+  --sans:  "Cutive Mono", ui-monospace, "Courier New", monospace;
+  --display: "Cutive Mono", ui-monospace, monospace;
+  --title: "Black Mango", "Instrument Serif", Georgia, serif;
 
   --fs-body: clamp(15px, 1.05vw, 17px);
 
